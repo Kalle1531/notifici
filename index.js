@@ -79,6 +79,26 @@ app.get('/api/scripts/:scriptId', (req, res) => {
   }
 });
 
+// Endpoint for custom scripts (for testing)
+app.get('/api/scripts/custom', (req, res) => {
+  const { key, code } = req.query;
+  
+  if (!key) {
+    return res.status(401).send('-- No key provided');
+  }
+  
+  if (!code) {
+    return res.status(400).send('-- No code provided');
+  }
+  
+  // Create an inline script with the provided code
+  const scriptContent = `-- Custom script with key: ${key}
+
+${decodeURIComponent(code)}`;
+  
+  res.type('text/plain').send(scriptContent);
+});
+
 // Endpoint to serve a generic loader
 app.get('/api/scripts/loader', (req, res) => {
   const { key } = req.query;
@@ -136,25 +156,7 @@ ${code || '-- Empty script\nprint("Hello world!")'}`;
   }
 });
 
-// Endpoint for custom scripts (for testing)
-app.get('/api/scripts/custom', (req, res) => {
-  const { key, code } = req.query;
-  
-  if (!key) {
-    return res.status(401).send('-- No key provided');
-  }
-  
-  if (!code) {
-    return res.status(400).send('-- No code provided');
-  }
-  
-  // Create an inline script with the provided code
-  const scriptContent = `-- Custom script with key: ${key}
 
-${decodeURIComponent(code)}`;
-  
-  res.type('text/plain').send(scriptContent);
-});
 
 // Start the server
 app.listen(PORT, () => {
