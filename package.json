@@ -1,0 +1,25 @@
+{
+  "name": "script-server",
+  "version": "1.0.0",
+  "description": "Script server for Roblox Lua scripts with key authentication",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [
+    "roblox",
+    "scripts",
+    "lua"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3"
+  },
+  "engines": {
+    "node": ">=14"
+  }
+}
