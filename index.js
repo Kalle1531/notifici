@@ -98,6 +98,64 @@ app.get('/api/scripts/loader', (req, res) => {
   }
 });
 
+// Endpoint to create or update a script
+app.post('/api/scripts/:scriptId', (req, res) => {
+  const { scriptId } = req.params;
+  const { key, code, name, author, version } = req.body;
+  
+  // In a production environment, you should verify this is an admin key
+  if (!key || !key.startsWith('ADMIN_')) {
+    return res.status(401).json({ success: false, message: 'Invalid admin key' });
+  }
+  
+  try {
+    // Create script content with metadata
+    const scriptContent = `--[[    Script: ${name || 'Unnamed'}
+    Author: ${author || 'Unknown'}
+    Version: ${version || '1.0.0'}
+    ID: ${scriptId}
+]]
+
+-- This script is hosted on ${req.hostname}
+-- Your key: %KEY%
+
+${code || '-- Empty script\nprint("Hello world!")'}`;
+    
+    // Write script to file
+    const scriptPath = path.join(scriptsDir, `${scriptId}.lua`);
+    fs.writeFileSync(scriptPath, scriptContent);
+    
+    res.json({
+      success: true,
+      message: 'Script created/updated successfully',
+      scriptUrl: `/api/scripts/${scriptId}`
+    });
+  } catch (error) {
+    console.error('Error creating script:', error);
+    res.status(500).json({ success: false, message: 'Error creating script: ' + error.message });
+  }
+});
+
+// Endpoint for custom scripts (for testing)
+app.get('/api/scripts/custom', (req, res) => {
+  const { key, code } = req.query;
+  
+  if (!key) {
+    return res.status(401).send('-- No key provided');
+  }
+  
+  if (!code) {
+    return res.status(400).send('-- No code provided');
+  }
+  
+  // Create an inline script with the provided code
+  const scriptContent = `-- Custom script with key: ${key}
+
+${decodeURIComponent(code)}`;
+  
+  res.type('text/plain').send(scriptContent);
+});
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
